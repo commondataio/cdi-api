@@ -4,14 +4,14 @@ from pydantic import BaseModel, Field
 
 from cdiapi import settings
 from .datacatalog import DataCatalog
-
+from .search import SearchIndexEntry
 
 class ErrorResponse(BaseModel):
     detail: str = Field(..., examples=["Detailed error message"])
 
 DataCatalogResponse = DataCatalog
 
-
+SearchIndexEntryResponse = SearchIndexEntry
 
 class SearchMeta(BaseModel):
     offset: int = Field(..., examples=['0'])
@@ -27,3 +27,8 @@ class DataCatalogSearchItem(BaseModel):
 class DataCatalogSearchResponse(BaseModel):
     meta: SearchMeta = Field(..., examples=[])
     data: List[DataCatalogSearchItem] = Field(..., examples=[])
+
+
+class SearchIndexSearchResponse(BaseModel):
+    meta: SearchMeta = Field(..., examples=[])
+    data: List[SearchIndexEntry] = Field(..., examples=[])

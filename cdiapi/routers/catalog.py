@@ -16,7 +16,7 @@ db = client.cdi
 
 
 @router.get(
-    "/catalog/{catalog_id}",
+    "/registry/catalog/{catalog_id}",
     tags=["Data catalogs registry"],
     response_model=DataCatalogResponse,
     responses={
@@ -28,7 +28,7 @@ db = client.cdi
 async def fetch_datacatalog(
     response: Response,
     catalog_id: str = Path(
-        description="UID of the data catalog to retrieve", examples=["cdi00000006"], default=None
+        description="UID of the data catalog to retrieve", examples=["cdi00000006"]
     ),
 ) -> Union[RedirectResponse, DataCatalogResponse]:
     """Retrieve a single data catalog registry item by its UID. The record will be returned in
@@ -46,7 +46,7 @@ async def fetch_datacatalog(
 
 
 @router.get(
-    "/search/catalogs/",
+    "/registry/search/catalogs/",
     tags=["Data catalogs registry"],
     response_model=DataCatalogSearchResponse,
     responses={
@@ -54,7 +54,7 @@ async def fetch_datacatalog(
         500: {"model": ErrorResponse, "description": "Server error"},
     },
 )
-async def fetch_datacatalog(
+async def search_datacatalog(
     response: Response,
     q: str = Query("", title="Query text"),
     limit: int = Query(10, title="Number of results to return", le=settings.MAX_PAGE),
@@ -79,7 +79,7 @@ async def fetch_datacatalog(
     if catalog_type: query['catalog_type'] = catalog_type
     if owner_country: query['owner.location.country'] = {'$in': owner_country}
     if coverage_country: query['coverage.location.country'] = {'$in': coverage_country}
-    total = await db['catalogs'].count_documents({})
+    total = await db['catalogs'].count_documents(query)
     items = await db["catalogs"].find(query, {'uid' : 1, 'name' : 1, 'link' : 1}).skip(offset).limit(limit).to_list(limit)
     if items is None or len(items) == 0:
         raise HTTPException(404, detail="No such data catalog!")
