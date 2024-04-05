@@ -2,18 +2,20 @@ from datetime import datetime
 from typing import Dict, List, Union, Optional
 from pydantic import BaseModel, Field
 
-
+from .shared import SpokenLanguage, Location, Topic, Endpoint, Identifier, Organization, Software, Country, SubRegion, MacroRegion
 
 class SearchIndexSourceRecord(BaseModel):
     uid: str = Field(..., examples=["cdi00001616"])
     name: str = Field(..., examples=["Data.gov portal"])
     url: str = Field(..., examples=["https://catalog.data.gov"])
     catalog_type: str = Field(..., examples=["Open data portal"])
-    langs: List[str] = Field([], examples=[["EN", "ES", "FR"]])
+    langs: List[SpokenLanguage] = Field([], examples=[])
     owner_name: str = Field(..., examples=["USA Government"])
     owner_type: str = Field(..., examples=["Central government"])
-    software: str = Field(..., examples=["CKAN"])
-    countries: List[str] = Field([], examples=[["United States", "France", "Mauritania"]])
+    software: Software = Field(..., examples=["CKAN"])
+    countries: List[Country] = Field([], examples=[])
+    macroregions: List[MacroRegion] = Field([], examples=[])
+    subregions: List[SubRegion] = Field([], examples=[])
 
 
 class SearchIndexParty(BaseModel):
@@ -31,6 +33,7 @@ class SearchIndexDatasetRecord(BaseModel):
     has_archive: bool = Field(False, examples=['False'])
     tags: Optional[List[str]] = Field(None, examples=['Farm', "Crops"])
     formats: Optional[List[str]] = Field([], examples=['XLSX', "CSV"])
+    datatypes: Optional[List[str]] = Field([], examples=['data', "geodata"])
     topics_origial: Optional[List[str]] = Field(None, examples=['Farm', "Crops"])
     responsible: List[SearchIndexParty] = Field(None, examples=[])
     license_id: Optional[str] = Field(None, examples=["cc-by"])
@@ -40,7 +43,7 @@ class SearchIndexDatasetRecord(BaseModel):
 class SearchIndexResourceRecord(BaseModel):
     id: Optional[str] = Field(None, examples=["f7ddcec7-5f5a-4458-8b10-ec8fd2d4a93b"])
     name: Optional[str] = Field(None, examples=["Data.gov portal"])
-    datasize: Optional[int] = Field(None, examples=["100000"])
+    datasize: Optional[str] = Field(None, examples=["100000"])
     format: Optional[str] = Field(None, examples=["XLSX"])
     mimetype: Optional[str] = Field(None, examples=["application/vnd.excel"])
     url: Optional[str] = Field(None, examples=["http://data.bayanat.ae/en_GB/dataset/c4a88574-7a2a-4048-bc9f-07de0559e7b7/resource/f7ddcec7-5f5a-4458-8b10-ec8fd2d4a93b/download/open-field-_exposed_-vegetable-crops.xlsx"])
@@ -49,7 +52,7 @@ class SearchIndexResourceRecord(BaseModel):
 
 class SearchIndexEntry(BaseModel):
     id: str = Field(..., examples=["cdi00000002-c4a88574-7a2a-4048-bc9f-07de0559e7b7"])
-    int_id: str = Field(..., examples=["c4a88574-7a2a-4048-bc9f-07de0559e7b7"])
+    int_id: Optional[str] = Field(..., examples=["c4a88574-7a2a-4048-bc9f-07de0559e7b7"])
     source: SearchIndexSourceRecord = Field(..., examples=[])
     dataset: SearchIndexDatasetRecord = Field(..., examples=[])
     resources: List[SearchIndexResourceRecord] = Field(..., examples=[])

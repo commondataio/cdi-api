@@ -34,10 +34,10 @@ async def fetch_entry(
 
     Intro: [search index](https://commondata.io/docs/searchindex).
     """
-    item = await db["cdifull"].find_one({'id' : entry_id})
+    item = await db["fulldb"].find_one({'id' : entry_id})
     if item is None:
         raise HTTPException(404, detail="No such entry!")
-    log.info(item['name'], action="searchentry", entry_id=entry_id)
+#    log.info(item['name'], action="searchentry", entry_id=entry_id)
     response.headers.update(settings.CACHE_HEADERS)
     return item
 
@@ -73,16 +73,16 @@ async def search_entries(
     """
     query = {}
     if q: query['$text'] = {'$search' : q}
-    if software: query['source.software'] = software
+    if software: query['source.software.id'] = software
     if owner_type: query['source.owner_type'] = owner_type
     if catalog_type: query['source.catalog_type'] = catalog_type
     if countries: query['source.countries'] = {'$in': countries}
-    if langs: query['source.langs'] = {'$in': langs}
+    if langs: query['source.langs.id'] = {'$in': langs}
     if tags: query['dataset.tags'] = {'$in': tags}
     if topics: query['dataset.topics'] = {'$in': topics}
     if geotopics: query['dataset.geotopics'] = {'$in': geotopics}
-    total = await db['cdifull'].count_documents(query)
-    items = await db["cdifull"].find(query, {}).skip(offset).limit(limit).to_list(limit)
+    total = await db['fulldb'].count_documents(query)
+    items = await db["fulldb"].find(query, {}).skip(offset).limit(limit).to_list(limit)
     if items is None or len(items) == 0:
         raise HTTPException(404, detail="Nothing found")
     log.info(str(query), action="catalogsearch", search_query=query)
