@@ -20,7 +20,7 @@ class SearchIndexSourceRecord(BaseModel):
 
 class SearchIndexParty(BaseModel):
     id: Optional[str] = Field(None, examples=["abu-dhabi-agriculture-and-food-safety-authority"])
-    title: str = Field(..., examples=["Abu Dhabi Agriculture And Food Safety Authority"])
+    title: Union[str, None] = Field(..., examples=["Abu Dhabi Agriculture And Food Safety Authority"])
     role: str = Field(..., examples=["Publisher"])
 
 class SearchIndexDatasetRecord(BaseModel):
@@ -43,7 +43,7 @@ class SearchIndexDatasetRecord(BaseModel):
 class SearchIndexResourceRecord(BaseModel):
     id: Optional[str] = Field(None, examples=["f7ddcec7-5f5a-4458-8b10-ec8fd2d4a93b"])
     name: Optional[str] = Field(None, examples=["Data.gov portal"])
-    datasize: Optional[str] = Field(None, examples=["100000"])
+    datasize: Union[str, int, None] = Field(None, examples=["100000"])
     format: Optional[str] = Field(None, examples=["XLSX"])
     mimetype: Optional[str] = Field(None, examples=["application/vnd.excel"])
     url: Optional[str] = Field(None, examples=["http://data.bayanat.ae/en_GB/dataset/c4a88574-7a2a-4048-bc9f-07de0559e7b7/resource/f7ddcec7-5f5a-4458-8b10-ec8fd2d4a93b/download/open-field-_exposed_-vegetable-crops.xlsx"])
