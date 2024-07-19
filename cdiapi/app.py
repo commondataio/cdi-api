@@ -8,7 +8,7 @@ from structlog.contextvars import clear_contextvars, bind_contextvars
 
 from cdiapi import settings
 from cdiapi.logs import get_logger
-from cdiapi.routers import catalog, search
+from cdiapi.routers import catalog, search, raw
 
 log = get_logger("cdiapi")
 
@@ -68,6 +68,7 @@ def create_app() -> FastAPI:
     )
     app.middleware("http")(request_middleware)
     app.include_router(catalog.router)
+    app.include_router(raw.router)
     app.include_router(search.router)
 
 #    app.add_exception_handler(ApiError, api_error_handler)

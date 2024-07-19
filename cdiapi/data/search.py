@@ -41,7 +41,7 @@ class SearchIndexDatasetRecord(BaseModel):
     license_url: Optional[str] = Field(None, examples=[])
 
 class SearchIndexResourceRecord(BaseModel):
-    id: Optional[str] = Field(None, examples=["f7ddcec7-5f5a-4458-8b10-ec8fd2d4a93b"])
+    id: Union[str, int] = Field(None, examples=["f7ddcec7-5f5a-4458-8b10-ec8fd2d4a93b"])
     name: Optional[str] = Field(None, examples=["Data.gov portal"])
     datasize: Union[str, int, None] = Field(None, examples=["100000"])
     format: Optional[str] = Field(None, examples=["XLSX"])

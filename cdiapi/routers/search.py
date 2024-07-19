@@ -1,6 +1,8 @@
 from typing import List, Optional, Union
 from fastapi import APIRouter, Path, Query, Response, HTTPException
 from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse
+import meilisearch
 
 from cdiapi import settings
 from cdiapi.logs import get_logger
@@ -14,10 +16,17 @@ router = APIRouter()
 client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://localhost:27017")
 db = client.cdisearch
 
+DEFAULT_URL = 'https://localhost:7090'
+
+class MeiliWrapper:
+    def __init__(self, url:str=DEFAULT_URL, key:str=None, index_name:str=None):        
+        self.client = meilisearch.Client(url, key)
+        self.m_index = self.client.index(index_name) if index_name is not None else None
+
 
 @router.get(
-    "/raw/0.1/entry/{entry_id}",
-    tags=["Search index data access"],
+    "/search/0.1/entry/{entry_id}",
+    tags=["search", 'search index'],
     response_model=SearchIndexEntryResponse,
     responses={
         404: {"model": ErrorResponse, "description": "Object not found"},
@@ -30,9 +39,7 @@ async def fetch_entry(
         description="Search index single entry", examples=["c4a88574-7a2a-4048-bc9f-07de0559e7b7"]
     ),
 ) -> Union[RedirectResponse, SearchIndexEntryResponse]:
-    """Retrieve a single entry
-
-    Intro: [search index](https://commondata.io/docs/searchindex).
+    """Retrieve a single dataset
     """
     item = await db["fulldb"].find_one({'id' : entry_id})
     if item is None:
@@ -42,52 +49,39 @@ async def fetch_entry(
     return item
 
 
+
 @router.get(
-    "/raw/0.1/search",
-    tags=["Search index data access"],
+    "/index/0.1/query",
+    tags=["search", 'search index'],
     response_model=SearchIndexSearchResponse,
     responses={
         404: {"model": ErrorResponse, "description": "Object not found"},
         500: {"model": ErrorResponse, "description": "Server error"},
     },
 )
+
+
 async def search_entries(
     response: Response,
-    q: str = Query("", title="Query text"),
-    limit: int = Query(10, title="Number of results to return", le=settings.MAX_PAGE),
+    q: str = Query("", title="Query text, for example: 'Atlantic salmon'"),
+    filters: List[str] = Query([], title="Filters by vacets value. Should be like \"source.catalog_type\"=\"Geoportal\" "),
+    limit: int = Query(1000, title="Number of results to return", le=settings.MAX_PAGE),
     offset: int = Query(
         0, title="Start at result with given offset", le=settings.MAX_OFFSET
     ),
-    software: str = Query(None, title="Software identifier"),
-    owner_type: str = Query(None, title="Owner type"),
-    catalog_type: str = Query(None, title="Owner type"),
-    topics: List[str] = Query([], title="EU Data themes"),
-    geotopics: List[str] = Query([], title="Geo topics"),
-    countries: List[str] = Query([], title="Country of the owner"),
-    langs: List[str] = Query([], title="Spoken languages"),
-    tags: List[str] = Query([], title="Tags"),
-) -> Union[RedirectResponse, SearchIndexSearchResponse]:
-    """Retrieve a list of data catalog registry item.
-
-    Intro: [data catalog records](https://commondata.io/docs/datacatalog).
-    """
-    query = {}
-    if q: query['$text'] = {'$search' : q}
-    if software: query['source.software.id'] = software
-    if owner_type: query['source.owner_type'] = owner_type
-    if catalog_type: query['source.catalog_type'] = catalog_type
-    if countries: query['source.countries'] = {'$in': countries}
-    if langs: query['source.langs.id'] = {'$in': langs}
-    if tags: query['dataset.tags'] = {'$in': tags}
-    if topics: query['dataset.topics'] = {'$in': topics}
-    if geotopics: query['dataset.geotopics'] = {'$in': geotopics}
-    total = await db['fulldb'].count_documents(query)
-    items = await db["fulldb"].find(query, {}).skip(offset).limit(limit).to_list(limit)
-    if items is None or len(items) == 0:
-        raise HTTPException(404, detail="Nothing found")
-    log.info(str(query), action="catalogsearch", search_query=query)
-    response.headers.update(settings.CACHE_HEADERS)
-    meta = {'offset' : offset, 'limit' : limit, 'num' : len(items), 'total': total}
-    response = {'meta' : meta, 'data' : items} 
-    return response
+    page: int = Query(
+        1, title="Page number"
+    ),
+    facets:bool = Query(True, title="Enable/Disable facets output"),
+    sort_by:str=Query(settings.DEFAULT_SORT, title="Sort by fields, default 'scores.feature_score:desc'. Use single field or list of fields divided by comma. Supported fields: 'scores.feature_score', 'dataset.title', 'source.uid'")    
+) -> Union[RedirectResponse, JSONResponse]:
+    """Dataset search).
+    """    
+    wrapper = MeiliWrapper(settings.MEILI_URL, settings.MEILI_KEY, index_name=settings.MEILI_INDEX)
+    params = {'offset' : offset, 'limit' : limit, 'filter' : filters, 
+                'hitsPerPage' : 20, 'sort' : sort_by.split(','), 'page' : page}
+    if facets:
+        params['facets'] = settings.DEFAULT_FACETS
+    results = wrapper.m_index.search(q, params)
+    return JSONResponse(results)
 

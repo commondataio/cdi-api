@@ -14,15 +14,15 @@ def env_str(name: str, default: Optional[str] = None) -> Optional[str]:
     return default if value is None else value
 
 
-VERSION = "1.0.0"
-AUTHOR = "Common Data Index"
-HOME_PAGE = "https://commondata.io"
+VERSION = "0.0.2"
+AUTHOR = "Dateno"
+HOME_PAGE = "https://dateno.io"
 EMAIL = "info@commondata.io"
 CONTACT = {"name": AUTHOR, "url": HOME_PAGE, "email": EMAIL}
 
-TITLE = env_str("CDI_TITLE") or "Common Data Index"
+TITLE = env_str("CDI_TITLE") or "Dateno API"
 DESCRIPTION = """
-The Common Data Index API provides endpoints that help you to access registry of the data catalogs, raw indexes of metadata and search index.
+Dateno API API provides endpoints that help you to access registry of the data catalogs, raw indexes of metadata and search index.
 """
 
 TAGS: List[Dict[str, Any]] = [
@@ -83,12 +83,18 @@ MAX_PAGE = 500
 
 MAX_OFFSET = 100000
 
-# ElasticSearch settings:
-MEILI_URL = env_str("CDIAPI_MEILISEARCH_URL", "http://localhost:7700")
-MEILI_KEY = env_str("CDIAPI_MEILISEARCH_KEY")
+# Meilisearch settings:
+MEILI_URL = env_str("CDIAPI_MEILISEARCH_URL", "http://ms15.dateno.io:7090")
+MEILI_KEY = env_str("CDIAPI_MEILISEARCH_KEY", 'aXe-8cVprRVsBljTbkgeB2JeOESxeL4j-MSIQIpKOe')
+MEILI_INDEX = env_str("CDIAPI_MEILISEARCH_INDEX", 'fulldb')
+
+DEFAULT_FACETS = ["dataset.datatypes","dataset.formats","dataset.geotopics","dataset.license_id","dataset.topics","source.catalog_type","source.countries.name","source.langs.name","source.macroregions.name","source.name","source.owner_type","source.software.name","source.subregions.name"]
+DEFAULT_SORT = "scores.feature_score:desc"
+
+DEFAULT_SORT_BY = {'feature_score' : "scores.feature_score:desc"}
 
 # Log output can be formatted as JSON:
-LOG_JSON = as_bool(env_str("CDI_LOG_JSON", "false"))
+LOG_JSON = as_bool(env_str("CDI_LOG_JSON", "true"))
 LOG_LEVEL = logging.DEBUG if DEBUG else logging.INFO
 
 # Used to pad out first_seen, last_seen on static collections
