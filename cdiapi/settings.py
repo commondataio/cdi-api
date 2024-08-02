@@ -85,7 +85,7 @@ MAX_OFFSET = 100000
 
 # Meilisearch settings:
 MEILI_URL = env_str("CDIAPI_MEILISEARCH_URL", "http://ms15.dateno.io:7090")
-MEILI_KEY = env_str("CDIAPI_MEILISEARCH_KEY", 'aXe-8cVprRVsBljTbkgeB2JeOESxeL4j-MSIQIpKOe')
+MEILI_KEY = env_str("CDIAPI_MEILISEARCH_KEY", '')
 MEILI_INDEX = env_str("CDIAPI_MEILISEARCH_INDEX", 'fulldb')
 
 DEFAULT_FACETS = ["dataset.datatypes","dataset.formats","dataset.geotopics","dataset.license_id","dataset.topics","source.catalog_type","source.countries.name","source.langs.name","source.macroregions.name","source.name","source.owner_type","source.software.name","source.subregions.name"]

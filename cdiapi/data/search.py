@@ -19,8 +19,8 @@ class SearchIndexSourceRecord(BaseModel):
 
 
 class YearRange(BaseModel):
-    start: int = Field(..., examples=["2005"])
-    end: int = Field(..., examples=["2023"])
+    start: Union[int, None] = Field(..., examples=["2005"])
+    end: Union[int,None] = Field(..., examples=["2023"])
 
 class SearchIndexParty(BaseModel):
     id: Optional[str] = Field(None, examples=["abu-dhabi-agriculture-and-food-safety-authority"])
@@ -38,13 +38,13 @@ class SearchIndexDatasetRecord(BaseModel):
     tags: Optional[List[str]] = Field(None, examples=['Farm', "Crops"])
     formats: Optional[List[str]] = Field([], examples=['XLSX', "CSV"])
     datatypes: Optional[List[str]] = Field([], examples=['data', "geodata"])
-    topics_origial: Optional[List[str]] = Field(None, examples=['Farm', "Crops"])
+    topics_original: Optional[List[str]] = Field(None, examples=['Farm', "Crops"])
     responsible: List[SearchIndexParty] = Field(None, examples=[])
     license_id: Optional[str] = Field(None, examples=["cc-by"])
     license_name: Optional[str] = Field(None, examples=["Creative Commons Attribution"])
     license_url: Optional[str] = Field(None, examples=[])
-    frequency: Optional[str] = Field(None, examples=["Yearly", "Quarterly", "Monthly"])
-    year_range: Optional[YearRange] = Field(..., examples=[])
+#    frequency: Optional[str] = Field(None, examples=["Yearly", "Quarterly", "Monthly"])
+#    year_range: Optional[YearRange] = Field(..., examples=[])
 
 class SearchIndexResourceRecord(BaseModel):
     id: Union[str, int] = Field(None, examples=["f7ddcec7-5f5a-4458-8b10-ec8fd2d4a93b"])
