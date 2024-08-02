@@ -24,3 +24,8 @@ hypercorn cdiapi.app:app
 ### License and Support
 
 ``cdi-api`` is licensed according to the MIT license terms documented in ``LICENSE``. Using the service in a commercial context may require a license from Common Data Index.
+
+### Use prepared scripts
+
+* run_int.sh - Internal version of the cdi-api (hidden behind Kong)
+* run_public.sh - Public version of the cdi-api (used by dateno.io search)

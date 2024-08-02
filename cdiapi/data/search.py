@@ -18,13 +18,17 @@ class SearchIndexSourceRecord(BaseModel):
     subregions: List[SubRegion] = Field([], examples=[])
 
 
+class YearRange(BaseModel):
+    start: int = Field(..., examples=["2005"])
+    end: int = Field(..., examples=["2023"])
+
 class SearchIndexParty(BaseModel):
     id: Optional[str] = Field(None, examples=["abu-dhabi-agriculture-and-food-safety-authority"])
     title: Union[str, None] = Field(..., examples=["Abu Dhabi Agriculture And Food Safety Authority"])
     role: str = Field(..., examples=["Publisher"])
 
 class SearchIndexDatasetRecord(BaseModel):
-    id: str = Field(..., examples=[""])
+    id: Union[str,int] = Field(..., examples=[""])
     title: str = Field(None, examples=["Name of the dataset"])
     num_resources: int = Field(..., examples=["1"])
     url: str = Field(..., examples=["https://data.bayanat.ae/dataset/open-field-exposed-vegetable-crops"])
@@ -39,6 +43,8 @@ class SearchIndexDatasetRecord(BaseModel):
     license_id: Optional[str] = Field(None, examples=["cc-by"])
     license_name: Optional[str] = Field(None, examples=["Creative Commons Attribution"])
     license_url: Optional[str] = Field(None, examples=[])
+    frequency: Optional[str] = Field(None, examples=["Yearly", "Quarterly", "Monthly"])
+    year_range: Optional[YearRange] = Field(..., examples=[])
 
 class SearchIndexResourceRecord(BaseModel):
     id: Union[str, int] = Field(None, examples=["f7ddcec7-5f5a-4458-8b10-ec8fd2d4a93b"])
